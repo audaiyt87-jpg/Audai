@@ -1,0 +1,31 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pyinstaller==6.11.1 customtkinter==5.2.2 openpyxl==3.1.5
+
+      - name: Build EXE
+        run: pyinstaller --onefile --windowed --name SalaryCalculator --collect-all customtkinter --hidden-import openpyxl salary_calculator.pyw
+
+      - name: Upload EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SalaryCalculator-Windows
+          path: dist/SalaryCalculator.exe
+          if-no-files-found: error
